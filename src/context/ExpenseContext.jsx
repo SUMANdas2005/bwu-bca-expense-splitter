@@ -1,9 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import {
-  INITIAL_MEMBERS,
-  INITIAL_GROUPS,
-  INITIAL_EXPENSES,
-  INITIAL_SETTLEMENTS,
   EXPENSE_CATEGORIES,
 } from "../data/initialData";
 import {
@@ -15,14 +11,28 @@ const ExpenseContext = createContext();
 
 const AVATAR_POOL = ["👤", "🧑‍💻", "👩‍💻", "🧑‍🎓", "👩‍🎓", "🧑", "👩", "👨"];
 
+// Clean up old demo data from browser storage automatically
+try {
+  localStorage.removeItem("bwu_expense_members");
+  localStorage.removeItem("bwu_expense_groups");
+  localStorage.removeItem("bwu_expense_items");
+  localStorage.removeItem("bwu_expense_settlements");
+} catch {
+  // Ignore
+}
+
 export const ExpenseProvider = ({ children }) => {
   // 1. Members State (Empty by default - added dynamically by users)
   const [members, setMembers] = useState(() => {
-    const saved = localStorage.getItem("bwu_expense_members");
-    return saved ? JSON.parse(saved) : INITIAL_MEMBERS;
+    try {
+      const saved = localStorage.getItem("bwu_clean_members");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
-  // Current active user (defaults to first member or 'You')
+  // Current active user
   const currentUser = useMemo(() => {
     if (members.length > 0) {
       return members.find((m) => m.isCurrentUser) || members[0];
@@ -38,37 +48,49 @@ export const ExpenseProvider = ({ children }) => {
 
   // 2. Groups State (Empty by default)
   const [groups, setGroups] = useState(() => {
-    const saved = localStorage.getItem("bwu_expense_groups");
-    return saved ? JSON.parse(saved) : INITIAL_GROUPS;
+    try {
+      const saved = localStorage.getItem("bwu_clean_groups");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
   // 3. Expenses State (Empty by default)
   const [expenses, setExpenses] = useState(() => {
-    const saved = localStorage.getItem("bwu_expense_items");
-    return saved ? JSON.parse(saved) : INITIAL_EXPENSES;
+    try {
+      const saved = localStorage.getItem("bwu_clean_expenses");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
   // 4. Settlements State (Empty by default)
   const [settlements, setSettlements] = useState(() => {
-    const saved = localStorage.getItem("bwu_expense_settlements");
-    return saved ? JSON.parse(saved) : INITIAL_SETTLEMENTS;
+    try {
+      const saved = localStorage.getItem("bwu_clean_settlements");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
   // Sync to localStorage
   useEffect(() => {
-    localStorage.setItem("bwu_expense_members", JSON.stringify(members));
+    localStorage.setItem("bwu_clean_members", JSON.stringify(members));
   }, [members]);
 
   useEffect(() => {
-    localStorage.setItem("bwu_expense_groups", JSON.stringify(groups));
+    localStorage.setItem("bwu_clean_groups", JSON.stringify(groups));
   }, [groups]);
 
   useEffect(() => {
-    localStorage.setItem("bwu_expense_items", JSON.stringify(expenses));
+    localStorage.setItem("bwu_clean_expenses", JSON.stringify(expenses));
   }, [expenses]);
 
   useEffect(() => {
-    localStorage.setItem("bwu_expense_settlements", JSON.stringify(settlements));
+    localStorage.setItem("bwu_clean_settlements", JSON.stringify(settlements));
   }, [settlements]);
 
   // Derived Calculations using JavaScript Array Operations (.reduce, .map, .filter)
@@ -192,16 +214,18 @@ export const ExpenseProvider = ({ children }) => {
 
   // Clear / Reset All Data
   const clearAllData = () => {
-    if (window.confirm("Are you sure you want to clear all data and start completely fresh?")) {
-      setMembers([]);
-      setGroups([]);
-      setExpenses([]);
-      setSettlements([]);
-      localStorage.removeItem("bwu_expense_members");
-      localStorage.removeItem("bwu_expense_groups");
-      localStorage.removeItem("bwu_expense_items");
-      localStorage.removeItem("bwu_expense_settlements");
-    }
+    setMembers([]);
+    setGroups([]);
+    setExpenses([]);
+    setSettlements([]);
+    localStorage.removeItem("bwu_clean_members");
+    localStorage.removeItem("bwu_clean_groups");
+    localStorage.removeItem("bwu_clean_expenses");
+    localStorage.removeItem("bwu_clean_settlements");
+    localStorage.removeItem("bwu_expense_members");
+    localStorage.removeItem("bwu_expense_groups");
+    localStorage.removeItem("bwu_expense_items");
+    localStorage.removeItem("bwu_expense_settlements");
   };
 
   return (
