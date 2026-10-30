@@ -1,0 +1,17 @@
+/* =========================================================
+   APP LAYOUT STYLES
+========================================================= */
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-body, #f8fafc);
+}
+
+.main-content-container {
+  flex: 1;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 20px;
+}

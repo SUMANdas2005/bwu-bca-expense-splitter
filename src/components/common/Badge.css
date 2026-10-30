@@ -1,0 +1,19 @@
+/* =========================================================
+   REUSABLE BADGE STYLES
+========================================================= */
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.badge-icon {
+  font-size: 12px;
+}

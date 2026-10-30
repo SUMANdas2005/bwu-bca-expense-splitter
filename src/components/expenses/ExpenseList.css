@@ -1,0 +1,270 @@
+/* =========================================================
+   EXPENSE LIST STYLES
+========================================================= */
+.expenses-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Filters Bar */
+.expense-filters-bar {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.search-input-wrap input {
+  width: 100%;
+  padding: 9px 36px 9px 34px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13.5px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.search-input-wrap input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.filter-dropdowns-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  background-color: #ffffff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filter-select:focus {
+  border-color: #0d6efd;
+}
+
+/* Strip */
+.filter-stats-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #64748b;
+  padding: 0 4px;
+}
+
+.filter-total-badge {
+  background-color: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: #1e293b;
+}
+
+/* Table Card */
+.expenses-table-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.expenses-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13.5px;
+}
+
+.expenses-table thead {
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.expenses-table th {
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.expenses-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s;
+}
+
+.expenses-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.expenses-table td {
+  padding: 14px 16px;
+  vertical-align: middle;
+  color: #334155;
+}
+
+.date-cell {
+  white-space: nowrap;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.desc-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 180px;
+}
+
+.desc-cell strong {
+  color: #0f172a;
+}
+
+.exp-notes {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.table-group-pill {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.payer-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.text-primary-bold {
+  color: #0d6efd;
+  font-weight: 700;
+}
+
+.split-count-badge {
+  background-color: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.amount-cell strong {
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.share-pill {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.share-pill.lent {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.share-pill.borrowed {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.share-pill.neutral {
+  color: #94a3b8;
+}
+
+.table-del-btn {
+  background: none;
+  border: 1px solid transparent;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.table-del-btn:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+}
+
+/* No expenses */
+.no-expenses-box {
+  text-align: center;
+  padding: 48px 24px;
+  color: #64748b;
+}
+
+.no-exp-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.no-expenses-box h4 {
+  margin: 0 0 6px;
+  color: #0f172a;
+}
+
+.no-expenses-box p {
+  margin: 0 0 16px;
+  font-size: 13px;
+}

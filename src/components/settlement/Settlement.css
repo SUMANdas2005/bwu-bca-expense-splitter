@@ -1,0 +1,360 @@
+/* =========================================================
+   SETTLEMENT PAGE STYLES
+========================================================= */
+.settlement-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.algorithm-info-banner {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.algo-badge {
+  background-color: #16a34a;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.algorithm-info-banner p {
+  margin: 0;
+  font-size: 13.5px;
+  color: #166534;
+}
+
+/* Transactions Grid */
+.settlement-transactions-section h3 {
+  font-size: 18px;
+  color: #0f172a;
+  margin: 0 0 16px;
+}
+
+.debts-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+@media (max-width: 768px) {
+  .debts-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.debt-transaction-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s;
+}
+
+.debt-transaction-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
+}
+
+.card-you-pay {
+  border-color: #fca5a5;
+  background-color: #fffafb;
+}
+
+.card-you-receive {
+  border-color: #86efac;
+  background-color: #f8fdf9;
+}
+
+.debt-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tx-index-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  background-color: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.you-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.you-tag.pay {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.you-tag.receive {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+/* Flow Visual */
+.debt-flow-visual {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+  background-color: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+}
+
+.party-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  width: 90px;
+}
+
+.party-avatar {
+  font-size: 26px;
+}
+
+.party-name {
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.party-code {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.party-role-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.party-role-tag.payer {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.party-role-tag.receiver {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.flow-amount-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.flow-arrow {
+  font-size: 20px;
+  color: #94a3b8;
+}
+
+.flow-amount-pill {
+  background-color: #0d6efd;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 999px;
+  box-shadow: 0 2px 4px rgba(13, 110, 253, 0.25);
+}
+
+.debt-card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* All Settled */
+.all-settled-card {
+  text-align: center;
+  padding: 48px 20px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.settled-large-icon {
+  font-size: 44px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.all-settled-card h3 {
+  margin: 0 0 6px;
+  color: #16a34a;
+}
+
+.all-settled-card p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Bottom Grid */
+.settlement-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .settlement-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.net-balances-table-wrap {
+  overflow-x: auto;
+}
+
+.net-balances-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.net-balances-table th {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.net-balances-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.net-balances-table code {
+  background-color: #f1f5f9;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.balance-status-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.balance-status-tag.settled { background-color: #f1f5f9; color: #64748b; }
+.balance-status-tag.credit  { background-color: #dcfce7; color: #15803d; }
+.balance-status-tag.debt    { background-color: #fee2e2; color: #b91c1c; }
+
+/* History List */
+.settlement-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+}
+
+.history-icon-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background-color: #dcfce7;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.history-info {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.history-text {
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.history-date {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.history-amount {
+  font-size: 14px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.empty-history-box {
+  text-align: center;
+  padding: 24px;
+  color: #94a3b8;
+}
+
+.settle-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settle-summary-box {
+  text-align: center;
+  padding: 16px;
+  background-color: #eff6ff;
+  border-radius: 10px;
+  border: 1px solid #bfdbfe;
+}
+
+.settle-flow-text {
+  font-size: 14px;
+  color: #1e40af;
+  margin-bottom: 6px;
+}
+
+.settle-big-amount {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0d6efd;
+}

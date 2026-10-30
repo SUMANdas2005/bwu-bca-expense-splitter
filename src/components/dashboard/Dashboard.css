@@ -1,0 +1,324 @@
+/* =========================================================
+   DASHBOARD STYLES
+========================================================= */
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Welcome Banner */
+.welcome-banner {
+  background: linear-gradient(135deg, #0d6efd 0%, #1e40af 100%);
+  color: #ffffff;
+  padding: 28px 32px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  box-shadow: 0 10px 15px -3px rgba(13, 110, 253, 0.2);
+}
+
+.welcome-content h1 {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 6px 0;
+}
+
+.welcome-content p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+  max-width: 600px;
+}
+
+.uni-sub-badge {
+  font-size: 11px;
+  text-transform: uppercase;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.welcome-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Main Grid */
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-left-col,
+.grid-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card-link-action {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary, #0d6efd);
+  text-decoration: none;
+}
+
+.card-link-action:hover {
+  text-decoration: underline;
+}
+
+/* Expense Feed */
+.expense-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.expense-feed-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+  background-color: #ffffff;
+  transition: all 0.2s;
+}
+
+.expense-feed-item:hover {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.expense-category-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.expense-feed-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.expense-feed-title {
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.expense-feed-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.group-name-tag {
+  color: #475569;
+  font-weight: 600;
+}
+
+.expense-feed-amounts {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.total-expense-amt {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.payer-sub-info {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.text-success-bold {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.user-borrow-pill {
+  font-size: 10px;
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.user-lent-pill {
+  font-size: 10px;
+  color: #10b981;
+  font-weight: 700;
+}
+
+/* Empty State */
+.empty-state-box {
+  text-align: center;
+  padding: 36px 20px;
+  color: #64748b;
+}
+
+.empty-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.empty-state-box p {
+  margin: 0;
+  font-weight: 700;
+  font-size: 15px;
+  color: #1e293b;
+}
+
+.empty-state-box small {
+  font-size: 12px;
+}
+
+/* Member Balances Widget */
+.member-balance-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.member-balance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+}
+
+.member-info-col {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.member-avatar-circle {
+  font-size: 20px;
+}
+
+.member-row-name {
+  display: block;
+  font-size: 13px;
+  color: #1e293b;
+}
+
+.member-row-code {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.balance-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.balance-pill.settled {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.balance-pill.positive {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.balance-pill.negative {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Groups Widget */
+.groups-widget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.group-widget-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+}
+
+.group-widget-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.group-widget-icon {
+  font-size: 20px;
+}
+
+.group-widget-head strong {
+  display: block;
+  font-size: 13px;
+  color: #1e293b;
+}
+
+.group-widget-head small {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.group-widget-total {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
