@@ -4,7 +4,9 @@ import Button from "./Button";
 import "./Navbar.css";
 
 function Navbar({ onOpenAddExpense }) {
-  const { currentUser, resetToInitialData } = useExpenses();
+  const { currentUser, clearAllData, members, expenses } = useExpenses();
+
+  const hasData = members.length > 0 || expenses.length > 0;
 
   return (
     <header className="app-navbar">
@@ -67,7 +69,7 @@ function Navbar({ onOpenAddExpense }) {
           </NavLink>
         </nav>
 
-        {/* Right Actions: Add Expense, Reset Demo, User Avatar */}
+        {/* Right Actions: Add Expense, Clear Data, User Avatar */}
         <div className="navbar-actions">
           <Button
             variant="primary"
@@ -78,21 +80,25 @@ function Navbar({ onOpenAddExpense }) {
             Add Expense
           </Button>
 
-          <button
-            type="button"
-            className="reset-demo-btn"
-            title="Reset to Brainware University sample data"
-            onClick={resetToInitialData}
-          >
-            🔄 Reset
-          </button>
+          {hasData && (
+            <button
+              type="button"
+              className="reset-demo-btn"
+              title="Clear all entered data to start fresh"
+              onClick={clearAllData}
+            >
+              🗑️ Clear
+            </button>
+          )}
 
           {/* Current User Badge */}
-          <div className="user-profile-pill" title={`Logged in as ${currentUser.name}`}>
-            <span className="user-avatar">{currentUser.avatar}</span>
+          <div className="user-profile-pill">
+            <span className="user-avatar">{currentUser.avatar || "👤"}</span>
             <div className="user-info">
-              <strong className="user-name">{currentUser.name}</strong>
-              <small className="user-code">{currentUser.code}</small>
+              <strong className="user-name">
+                {currentUser.name || "Student"}
+              </strong>
+              <small className="user-code">BWU/BCA/24/255</small>
             </div>
           </div>
         </div>

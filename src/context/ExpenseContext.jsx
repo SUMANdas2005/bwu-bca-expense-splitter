@@ -13,32 +13,42 @@ import {
 
 const ExpenseContext = createContext();
 
+const AVATAR_POOL = ["👤", "🧑‍💻", "👩‍💻", "🧑‍🎓", "👩‍🎓", "🧑", "👩", "👨"];
+
 export const ExpenseProvider = ({ children }) => {
-  // 1. Members State
-  const [members] = useState(() => {
+  // 1. Members State (Empty by default - added dynamically by users)
+  const [members, setMembers] = useState(() => {
     const saved = localStorage.getItem("bwu_expense_members");
     return saved ? JSON.parse(saved) : INITIAL_MEMBERS;
   });
 
-  // Current logged in student (Suman Kumar Das)
-  const currentUser = useMemo(
-    () => members.find((m) => m.isCurrentUser) || members[0],
-    [members]
-  );
+  // Current active user (defaults to first member or 'You')
+  const currentUser = useMemo(() => {
+    if (members.length > 0) {
+      return members.find((m) => m.isCurrentUser) || members[0];
+    }
+    return {
+      id: "user-default",
+      name: "You",
+      code: "BWU/BCA",
+      avatar: "👤",
+      isCurrentUser: true,
+    };
+  }, [members]);
 
-  // 2. Groups State
+  // 2. Groups State (Empty by default)
   const [groups, setGroups] = useState(() => {
     const saved = localStorage.getItem("bwu_expense_groups");
     return saved ? JSON.parse(saved) : INITIAL_GROUPS;
   });
 
-  // 3. Expenses State
+  // 3. Expenses State (Empty by default)
   const [expenses, setExpenses] = useState(() => {
     const saved = localStorage.getItem("bwu_expense_items");
     return saved ? JSON.parse(saved) : INITIAL_EXPENSES;
   });
 
-  // 4. Settlements State
+  // 4. Settlements State (Empty by default)
   const [settlements, setSettlements] = useState(() => {
     const saved = localStorage.getItem("bwu_expense_settlements");
     return saved ? JSON.parse(saved) : INITIAL_SETTLEMENTS;
@@ -76,22 +86,18 @@ export const ExpenseProvider = ({ children }) => {
   const currentUserMetrics = useMemo(() => {
     const userBalance = netBalances[currentUser.id] || 0;
 
-    // What others owe you
     const debtsOwedToYou = simplifiedDebts
       .filter((d) => d.toMember.id === currentUser.id)
       .reduce((sum, d) => sum + d.amount, 0);
 
-    // What you owe others
     const debtsYouOwe = simplifiedDebts
       .filter((d) => d.fromMember.id === currentUser.id)
       .reduce((sum, d) => sum + d.amount, 0);
 
-    // Total spent by current user
     const totalPaidByUser = expenses
       .filter((e) => e.paidById === currentUser.id)
       .reduce((sum, e) => sum + Number(e.amount), 0);
 
-    // Total expenses across all groups
     const grandTotalExpenses = expenses.reduce(
       (sum, e) => sum + Number(e.amount),
       0
@@ -106,26 +112,47 @@ export const ExpenseProvider = ({ children }) => {
     };
   }, [currentUser.id, netBalances, simplifiedDebts, expenses]);
 
-  // Category wise spending breakdown using array reduce
+  // Category breakdown
   const categoryBreakdown = useMemo(() => {
-    const breakdown = EXPENSE_CATEGORIES.map((cat) => {
+    const grandTotal =
+      expenses.reduce((sum, e) => sum + Number(e.amount), 0) || 1;
+
+    return EXPENSE_CATEGORIES.map((cat) => {
       const catExpenses = expenses.filter((e) => e.category === cat.id);
       const total = catExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
       return {
         ...cat,
         total,
         count: catExpenses.length,
+        percentage: Math.round((total / grandTotal) * 100),
       };
     });
-
-    const grandTotal = expenses.reduce((sum, e) => sum + Number(e.amount), 0) || 1;
-    return breakdown.map((cat) => ({
-      ...cat,
-      percentage: Math.round((cat.total / grandTotal) * 100),
-    }));
   }, [expenses]);
 
-  // Actions
+  // Dynamic Member Creation
+  const addMember = (name) => {
+    const trimmed = name.trim();
+    if (!trimmed) return null;
+
+    // Check if member already exists
+    const existing = members.find(
+      (m) => m.name.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (existing) return existing;
+
+    const newMember = {
+      id: `m-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      name: trimmed,
+      code: `MEMBER-${members.length + 1}`,
+      avatar: AVATAR_POOL[members.length % AVATAR_POOL.length],
+      isCurrentUser: members.length === 0, // First added person is current user
+    };
+
+    setMembers((prev) => [...prev, newMember]);
+    return newMember;
+  };
+
+  // Add Expense
   const addExpense = (expenseData) => {
     const newExpense = {
       ...expenseData,
@@ -135,20 +162,25 @@ export const ExpenseProvider = ({ children }) => {
     setExpenses((prev) => [newExpense, ...prev]);
   };
 
+  // Delete Expense
   const deleteExpense = (id) => {
     setExpenses((prev) => prev.filter((e) => e.id !== id));
   };
 
+  // Add Group
   const addGroup = (groupData) => {
     const newGroup = {
       ...groupData,
       id: `g-${Date.now()}`,
       createdAt: new Date().toISOString().split("T")[0],
       icon: groupData.icon || "👥",
+      members: groupData.members || [],
     };
     setGroups((prev) => [...prev, newGroup]);
+    return newGroup;
   };
 
+  // Add Settlement
   const addSettlement = (settlementData) => {
     const newSettlement = {
       ...settlementData,
@@ -158,11 +190,14 @@ export const ExpenseProvider = ({ children }) => {
     setSettlements((prev) => [newSettlement, ...prev]);
   };
 
-  const resetToInitialData = () => {
-    if (window.confirm("Are you sure you want to reset all data to Brainware University sample demo?")) {
-      setGroups(INITIAL_GROUPS);
-      setExpenses(INITIAL_EXPENSES);
-      setSettlements(INITIAL_SETTLEMENTS);
+  // Clear / Reset All Data
+  const clearAllData = () => {
+    if (window.confirm("Are you sure you want to clear all data and start completely fresh?")) {
+      setMembers([]);
+      setGroups([]);
+      setExpenses([]);
+      setSettlements([]);
+      localStorage.removeItem("bwu_expense_members");
       localStorage.removeItem("bwu_expense_groups");
       localStorage.removeItem("bwu_expense_items");
       localStorage.removeItem("bwu_expense_settlements");
@@ -182,11 +217,12 @@ export const ExpenseProvider = ({ children }) => {
         simplifiedDebts,
         currentUserMetrics,
         categoryBreakdown,
+        addMember,
         addExpense,
         deleteExpense,
         addGroup,
         addSettlement,
-        resetToInitialData,
+        clearAllData,
       }}
     >
       {children}

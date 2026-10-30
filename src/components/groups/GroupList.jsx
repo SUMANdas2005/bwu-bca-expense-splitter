@@ -8,7 +8,7 @@ import Badge from "../common/Badge";
 import "./GroupList.css";
 
 function GroupList({ onOpenAddExpense }) {
-  const { groups, members, expenses, addGroup } = useExpenses();
+  const { groups, members, expenses, addGroup, addMember } = useExpenses();
 
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
@@ -18,20 +18,21 @@ function GroupList({ onOpenAddExpense }) {
   const [category, setCategory] = useState("Academic");
   const [description, setDescription] = useState("");
   const [icon, setIcon] = useState("👥");
-  const [selectedMemberIds, setSelectedMemberIds] = useState(
-    members.map((m) => m.id)
-  );
+  const [memberInput, setMemberInput] = useState("");
+  const [groupMemberNames, setGroupMemberNames] = useState([]);
   const [formError, setFormError] = useState("");
 
-  const handleToggleMember = (memberId) => {
-    setSelectedMemberIds((prev) => {
-      if (prev.includes(memberId)) {
-        if (prev.length <= 2) return prev; // At least 2 members for a shared group
-        return prev.filter((id) => id !== memberId);
-      } else {
-        return [...prev, memberId];
-      }
-    });
+  const handleAddMemberName = () => {
+    const trimmed = memberInput.trim();
+    if (!trimmed) return;
+    if (!groupMemberNames.some((n) => n.toLowerCase() === trimmed.toLowerCase())) {
+      setGroupMemberNames((prev) => [...prev, trimmed]);
+    }
+    setMemberInput("");
+  };
+
+  const handleRemoveMemberName = (name) => {
+    setGroupMemberNames((prev) => prev.filter((n) => n !== name));
   };
 
   const handleCreateGroup = (e) => {
@@ -43,21 +44,26 @@ function GroupList({ onOpenAddExpense }) {
       return;
     }
 
-    if (selectedMemberIds.length < 2) {
-      setFormError("A shared expense group must have at least 2 members.");
+    if (groupMemberNames.length < 2) {
+      setFormError("Please add at least 2 member names for a shared group.");
       return;
     }
+
+    // Resolve or create members
+    const memberObjects = groupMemberNames.map((name) => addMember(name));
+    const memberIds = memberObjects.map((m) => m.id);
 
     addGroup({
       name: groupName.trim(),
       category,
       description: description.trim(),
       icon,
-      members: selectedMemberIds,
+      members: memberIds,
     });
 
     setGroupName("");
     setDescription("");
+    setGroupMemberNames([]);
     setIsNewGroupModalOpen(false);
   };
 
@@ -67,7 +73,7 @@ function GroupList({ onOpenAddExpense }) {
       <div className="page-header-row">
         <div>
           <h2>👥 Expense Groups</h2>
-          <p>Organize shared expenses into dedicated project, tour, or room circles</p>
+          <p>Organize shared expenses into dedicated circles (e.g. project, flat, tour)</p>
         </div>
         <Button
           variant="primary"
@@ -78,99 +84,121 @@ function GroupList({ onOpenAddExpense }) {
         </Button>
       </div>
 
-      {/* Groups Grid */}
-      <div className="groups-grid">
-        {groups.map((group) => {
-          const groupExpenses = expenses.filter((e) => e.groupId === group.id);
-          const totalSpent = groupExpenses.reduce(
-            (sum, e) => sum + Number(e.amount),
-            0
-          );
-          const groupMembers = members.filter((m) =>
-            group.members.includes(m.id)
-          );
+      {/* Groups Grid or Empty State */}
+      {groups.length === 0 ? (
+        <div className="empty-groups-state">
+          <span className="empty-groups-icon">📁</span>
+          <h3>No groups created yet</h3>
+          <p>
+            Create your first group (e.g. "College Project", "Roommates", "Trip") and add friends' names!
+          </p>
+          <Button
+            variant="primary"
+            icon="➕"
+            onClick={() => setIsNewGroupModalOpen(true)}
+          >
+            Create Your First Group
+          </Button>
+        </div>
+      ) : (
+        <div className="groups-grid">
+          {groups.map((group) => {
+            const groupExpenses = expenses.filter((e) => e.groupId === group.id);
+            const totalSpent = groupExpenses.reduce(
+              (sum, e) => sum + Number(e.amount),
+              0
+            );
+            const groupMembers = members.filter((m) =>
+              group.members.includes(m.id)
+            );
 
-          // Calculate group-specific balances
-          const groupBalances = calculateNetBalances(
-            groupMembers,
-            groupExpenses,
-            [],
-            group.id
-          );
+            const groupBalances = calculateNetBalances(
+              groupMembers,
+              groupExpenses,
+              [],
+              group.id
+            );
 
-          return (
-            <div key={group.id} className="group-card">
-              <div className="group-card-header">
-                <div className="group-avatar-wrap">
-                  <span>{group.icon}</span>
-                </div>
-                <div className="group-header-text">
-                  <h3>{group.name}</h3>
-                  <div className="group-badge-line">
-                    <Badge color="#0d6efd">{group.category}</Badge>
-                    <small>Created {formatDate(group.createdAt)}</small>
+            return (
+              <div key={group.id} className="group-card">
+                <div className="group-card-header">
+                  <div className="group-avatar-wrap">
+                    <span>{group.icon}</span>
+                  </div>
+                  <div className="group-header-text">
+                    <h3>{group.name}</h3>
+                    <div className="group-badge-line">
+                      <Badge color="#0d6efd">{group.category}</Badge>
+                      <small>Created {formatDate(group.createdAt)}</small>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {group.description && (
-                <p className="group-card-desc">{group.description}</p>
-              )}
+                {group.description && (
+                  <p className="group-card-desc">{group.description}</p>
+                )}
 
-              {/* Group Summary Metrics */}
-              <div className="group-metric-bar">
-                <div className="group-stat">
-                  <span>Total Spent</span>
-                  <strong>{formatCurrency(totalSpent)}</strong>
+                <div className="group-metric-bar">
+                  <div className="group-stat">
+                    <span>Total Spent</span>
+                    <strong>{formatCurrency(totalSpent)}</strong>
+                  </div>
+                  <div className="group-stat">
+                    <span>Expenses</span>
+                    <strong>{groupExpenses.length} bills</strong>
+                  </div>
+                  <div className="group-stat">
+                    <span>Members</span>
+                    <strong>{groupMembers.length} people</strong>
+                  </div>
                 </div>
-                <div className="group-stat">
-                  <span>Expenses</span>
-                  <strong>{groupExpenses.length} bills</strong>
+
+                {/* Members Avatars with Tooltip */}
+                <div className="group-members-row">
+                  <span className="members-label">Members:</span>
+                  <div className="member-avatar-stack">
+                    {groupMembers.map((m) => (
+                      <span
+                        key={m.id}
+                        className="stacked-avatar"
+                        title={m.name}
+                      >
+                        {m.avatar}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <div className="group-stat">
-                  <span>Members</span>
-                  <strong>{groupMembers.length} students</strong>
+
+                <div className="group-card-actions">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setSelectedGroup({
+                        group,
+                        groupMembers,
+                        groupBalances,
+                        groupExpenses,
+                        totalSpent,
+                      })
+                    }
+                  >
+                    View Balances
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    icon="➕"
+                    onClick={onOpenAddExpense}
+                  >
+                    Add Bill
+                  </Button>
                 </div>
               </div>
-
-              {/* Members Avatars with Tooltip */}
-              <div className="group-members-row">
-                <span className="members-label">Members:</span>
-                <div className="member-avatar-stack">
-                  {groupMembers.map((m) => (
-                    <span
-                      key={m.id}
-                      className="stacked-avatar"
-                      title={`${m.name} (${m.code})`}
-                    >
-                      {m.avatar}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Card Footer Actions */}
-              <div className="group-card-actions">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedGroup({ group, groupMembers, groupBalances, groupExpenses, totalSpent })}
-                >
-                  View Balances
-                </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  icon="➕"
-                  onClick={onOpenAddExpense}
-                >
-                  Add Bill
-                </Button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Modal 1: Create New Group */}
       <Modal
@@ -185,10 +213,11 @@ function GroupList({ onOpenAddExpense }) {
             <label>Group Name *</label>
             <input
               type="text"
-              placeholder="e.g. Goa Tour 2026, Mess Rent, Hackathon Team..."
+              placeholder="e.g. Goa Tour, Flat Rent, Hackathon Team..."
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               required
+              autoFocus
             />
           </div>
 
@@ -230,32 +259,51 @@ function GroupList({ onOpenAddExpense }) {
             />
           </div>
 
-          {/* Member Selection */}
+          {/* Member Name Input (Dynamic) */}
           <div className="form-group">
-            <label>Select Group Members (At least 2) *</label>
-            <div className="member-select-grid">
-              {members.map((m) => {
-                const isSelected = selectedMemberIds.includes(m.id);
-                return (
-                  <label
-                    key={m.id}
-                    className={`member-select-card ${
-                      isSelected ? "selected" : ""
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => handleToggleMember(m.id)}
-                    />
-                    <span className="m-avatar">{m.avatar}</span>
-                    <div className="m-text">
-                      <strong>{m.name}</strong>
-                      <small>{m.code}</small>
-                    </div>
-                  </label>
-                );
-              })}
+            <label>Add Members / Friends (Type names) *</label>
+            <div className="add-member-input-row">
+              <input
+                type="text"
+                placeholder="Type member name (e.g. Suman, Rahul, Priya...)"
+                value={memberInput}
+                onChange={(e) => setMemberInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddMemberName();
+                  }
+                }}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                icon="➕"
+                onClick={handleAddMemberName}
+              >
+                Add
+              </Button>
+            </div>
+
+            {/* Display Added Member Tags */}
+            <div className="added-member-tags">
+              {groupMemberNames.length === 0 ? (
+                <small className="no-members-hint">
+                  No members added yet. Type at least 2 names above!
+                </small>
+              ) : (
+                groupMemberNames.map((name) => (
+                  <span key={name} className="member-name-tag">
+                    👤 {name}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveMemberName(name)}
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))
+              )}
             </div>
           </div>
 
@@ -299,7 +347,6 @@ function GroupList({ onOpenAddExpense }) {
                       <span className="s-avatar">{m.avatar}</span>
                       <div>
                         <strong>{m.name}</strong>
-                        <small>{m.code}</small>
                       </div>
                     </div>
                     <div className="standing-badge">

@@ -42,9 +42,13 @@ function Dashboard({ onOpenAddExpense }) {
           <span className="uni-sub-badge">
             Brainware University • CSS Department
           </span>
-          <h1>Welcome back, {currentUser.name}! 👨‍💻</h1>
+          <h1>
+            {members.length > 0 && currentUser.name !== "You"
+              ? `Welcome back, ${currentUser.name}! 👨‍💻`
+              : "Shared Expense Splitter 💸"}
+          </h1>
           <p>
-            Track shared project costs, hostel bills, and trip expenses with automatic smart settlements.
+            Track shared project costs, room expenses, and tour bills with friends. Type names and calculate smart settlements!
           </p>
         </div>
         <div className="welcome-actions">
@@ -111,7 +115,7 @@ function Dashboard({ onOpenAddExpense }) {
         <StatCard
           title="Total Group Spending"
           value={formatCurrency(grandTotal)}
-          subtitle={`Across ${groups.length} active groups`}
+          subtitle={`Across ${groups.length} active group(s)`}
           icon="📊"
           variant="primary"
         />
@@ -125,16 +129,30 @@ function Dashboard({ onOpenAddExpense }) {
             title="🕒 Recent Shared Expenses"
             subtitle="Latest split transactions added by group members"
             action={
-              <Link to="/expenses" className="card-link-action">
-                View All ({expenses.length}) →
-              </Link>
+              expenses.length > 0 ? (
+                <Link to="/expenses" className="card-link-action">
+                  View All ({expenses.length}) →
+                </Link>
+              ) : null
             }
           >
             {expenses.length === 0 ? (
               <div className="empty-state-box">
                 <span className="empty-icon">🧾</span>
                 <p>No expenses added yet!</p>
-                <small>Click "Add New Expense" to create the first record.</small>
+                <small>
+                  Click the button below to add your first expense and type your friends' names!
+                </small>
+                <div style={{ marginTop: "14px" }}>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    icon="➕"
+                    onClick={onOpenAddExpense}
+                  >
+                    Add First Expense
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="expense-feed-list">
@@ -162,7 +180,7 @@ function Dashboard({ onOpenAddExpense }) {
                             {categoryObj?.label || exp.category}
                           </Badge>
                           <span>•</span>
-                          <span className="group-name-tag">{group?.name}</span>
+                          <span className="group-name-tag">{group?.name || "General"}</span>
                           <span>•</span>
                           <span>{formatDate(exp.date)}</span>
                         </div>
@@ -173,11 +191,7 @@ function Dashboard({ onOpenAddExpense }) {
                           {formatCurrency(exp.amount)}
                         </span>
                         <div className="payer-sub-info">
-                          {isPayer ? (
-                            <span className="text-success-bold">You paid</span>
-                          ) : (
-                            <span>Paid by {payer?.name.split(" ")[0]}</span>
-                          )}
+                          <span>Paid by {payer?.name || "Member"}</span>
                         </div>
                         {isParticipant && !isPayer && (
                           <small className="user-borrow-pill">
@@ -205,46 +219,55 @@ function Dashboard({ onOpenAddExpense }) {
             title="👥 Friends & Group Balances"
             subtitle="Overall net standings calculated automatically"
             action={
-              <Link to="/settle" className="card-link-action">
-                Smart Settle →
-              </Link>
+              members.length > 0 ? (
+                <Link to="/settle" className="card-link-action">
+                  Smart Settle →
+                </Link>
+              ) : null
             }
           >
-            <div className="member-balance-list">
-              {members.map((m) => {
-                const bal = netBalances[m.id] || 0;
-                const isUser = m.id === currentUser.id;
-                const isZeroBal = Math.abs(bal) <= 0.5;
+            {members.length === 0 ? (
+              <div className="empty-state-box">
+                <span className="empty-icon">👥</span>
+                <p>No members added yet</p>
+                <small>When you add expenses and type names, balances will appear here!</small>
+              </div>
+            ) : (
+              <div className="member-balance-list">
+                {members.map((m) => {
+                  const bal = netBalances[m.id] || 0;
+                  const isUser = m.id === currentUser.id;
+                  const isZeroBal = Math.abs(bal) <= 0.5;
 
-                return (
-                  <div key={m.id} className="member-balance-row">
-                    <div className="member-info-col">
-                      <span className="member-avatar-circle">{m.avatar}</span>
-                      <div>
-                        <strong className="member-row-name">
-                          {m.name} {isUser && "(You)"}
-                        </strong>
-                        <span className="member-row-code">{m.code}</span>
+                  return (
+                    <div key={m.id} className="member-balance-row">
+                      <div className="member-info-col">
+                        <span className="member-avatar-circle">{m.avatar}</span>
+                        <div>
+                          <strong className="member-row-name">
+                            {m.name} {isUser && "(You)"}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div className="member-balance-badge">
+                        {isZeroBal ? (
+                          <span className="balance-pill settled">Settled</span>
+                        ) : bal > 0 ? (
+                          <span className="balance-pill positive">
+                            Gets back {formatCurrency(bal)}
+                          </span>
+                        ) : (
+                          <span className="balance-pill negative">
+                            Owes {formatCurrency(-bal)}
+                          </span>
+                        )}
                       </div>
                     </div>
-
-                    <div className="member-balance-badge">
-                      {isZeroBal ? (
-                        <span className="balance-pill settled">Settled</span>
-                      ) : bal > 0 ? (
-                        <span className="balance-pill positive">
-                          Gets back {formatCurrency(bal)}
-                        </span>
-                      ) : (
-                        <span className="balance-pill negative">
-                          Owes {formatCurrency(-bal)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </Card>
 
           {/* Active Groups Widget */}
@@ -257,28 +280,36 @@ function Dashboard({ onOpenAddExpense }) {
               </Link>
             }
           >
-            <div className="groups-widget-list">
-              {groups.map((g) => {
-                const groupExpenseTotal = expenses
-                  .filter((e) => e.groupId === g.id)
-                  .reduce((sum, e) => sum + Number(e.amount), 0);
+            {groups.length === 0 ? (
+              <div className="empty-state-box">
+                <span className="empty-icon">📁</span>
+                <p>No groups created yet</p>
+                <small>Create groups for tours, room rent, or college projects!</small>
+              </div>
+            ) : (
+              <div className="groups-widget-list">
+                {groups.map((g) => {
+                  const groupExpenseTotal = expenses
+                    .filter((e) => e.groupId === g.id)
+                    .reduce((sum, e) => sum + Number(e.amount), 0);
 
-                return (
-                  <div key={g.id} className="group-widget-item">
-                    <div className="group-widget-head">
-                      <span className="group-widget-icon">{g.icon}</span>
-                      <div>
-                        <strong>{g.name}</strong>
-                        <small>{g.members.length} members</small>
+                  return (
+                    <div key={g.id} className="group-widget-item">
+                      <div className="group-widget-head">
+                        <span className="group-widget-icon">{g.icon}</span>
+                        <div>
+                          <strong>{g.name}</strong>
+                          <small>{g.members.length} members</small>
+                        </div>
                       </div>
+                      <span className="group-widget-total">
+                        {formatCurrency(groupExpenseTotal)}
+                      </span>
                     </div>
-                    <span className="group-widget-total">
-                      {formatCurrency(groupExpenseTotal)}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </Card>
         </div>
       </div>

@@ -13,6 +13,7 @@ function Settlement() {
     simplifiedDebts,
     netBalances,
     settlements,
+    expenses,
     addSettlement,
   } = useExpenses();
 
@@ -39,7 +40,7 @@ function Settlement() {
     setSettleNotes("");
   };
 
-  const isAllSettled = simplifiedDebts.length === 0;
+  const isAllSettled = expenses.length > 0 && simplifiedDebts.length === 0;
 
   return (
     <div className="settlement-page">
@@ -66,7 +67,13 @@ function Settlement() {
       <div className="settlement-transactions-section">
         <h3>🎯 Recommended Settlement Transactions ({simplifiedDebts.length})</h3>
 
-        {isAllSettled ? (
+        {expenses.length === 0 ? (
+          <div className="all-settled-card">
+            <span className="settled-large-icon">🧾</span>
+            <h3>No expenses recorded yet</h3>
+            <p>Once you add shared bills and names, smart settlement transactions will automatically calculate here!</p>
+          </div>
+        ) : isAllSettled ? (
           <div className="all-settled-card">
             <span className="settled-large-icon">🎉</span>
             <h3>Everyone is completely settled up!</h3>
@@ -100,9 +107,8 @@ function Settlement() {
                     <div className="party-box from-party">
                       <span className="party-avatar">{debt.fromMember.avatar}</span>
                       <strong className="party-name">
-                        {debt.fromMember.name.split(" ")[0]}
+                        {debt.fromMember.name}
                       </strong>
-                      <small className="party-code">{debt.fromMember.code}</small>
                       <span className="party-role-tag payer">Pays</span>
                     </div>
 
@@ -118,9 +124,8 @@ function Settlement() {
                     <div className="party-box to-party">
                       <span className="party-avatar">{debt.toMember.avatar}</span>
                       <strong className="party-name">
-                        {debt.toMember.name.split(" ")[0]}
+                        {debt.toMember.name}
                       </strong>
-                      <small className="party-code">{debt.toMember.code}</small>
                       <span className="party-role-tag receiver">Receives</span>
                     </div>
                   </div>
@@ -150,54 +155,56 @@ function Settlement() {
           title="📊 Individual Net Balances"
           subtitle="Positive balance means getting back, negative means owes money"
         >
-          <div className="net-balances-table-wrap">
-            <table className="net-balances-table">
-              <thead>
-                <tr>
-                  <th>Student Name</th>
-                  <th>Student Code</th>
-                  <th>Net Status</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {members.map((m) => {
-                  const bal = netBalances[m.id] || 0;
-                  const isZero = Math.abs(bal) <= 0.5;
+          {members.length === 0 ? (
+            <div className="empty-history-box">
+              <p>No members added yet</p>
+            </div>
+          ) : (
+            <div className="net-balances-table-wrap">
+              <table className="net-balances-table">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Net Status</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members.map((m) => {
+                    const bal = netBalances[m.id] || 0;
+                    const isZero = Math.abs(bal) <= 0.5;
 
-                  return (
-                    <tr key={m.id}>
-                      <td>
-                        <span style={{ marginRight: "6px" }}>{m.avatar}</span>
-                        <strong>{m.name}</strong> {m.id === currentUser.id && "(You)"}
-                      </td>
-                      <td>
-                        <code>{m.code}</code>
-                      </td>
-                      <td>
-                        <span
-                          className={`balance-status-tag ${
-                            isZero ? "settled" : bal > 0 ? "credit" : "debt"
-                          }`}
-                        >
-                          {isZero ? "Settled" : bal > 0 ? "Creditor (+)" : "Debtor (-)"}
-                        </span>
-                      </td>
-                      <td>
-                        <strong
-                          className={
-                            isZero ? "" : bal > 0 ? "text-success" : "text-danger"
-                          }
-                        >
-                          {isZero ? "₹0" : formatCurrency(Math.abs(bal))}
-                        </strong>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                    return (
+                      <tr key={m.id}>
+                        <td>
+                          <span style={{ marginRight: "6px" }}>{m.avatar}</span>
+                          <strong>{m.name}</strong> {m.id === currentUser.id && "(You)"}
+                        </td>
+                        <td>
+                          <span
+                            className={`balance-status-tag ${
+                              isZero ? "settled" : bal > 0 ? "credit" : "debt"
+                            }`}
+                          >
+                            {isZero ? "Settled" : bal > 0 ? "Creditor (+)" : "Debtor (-)"}
+                          </span>
+                        </td>
+                        <td>
+                          <strong
+                            className={
+                              isZero ? "" : bal > 0 ? "text-success" : "text-danger"
+                            }
+                          >
+                            {isZero ? "₹0" : formatCurrency(Math.abs(bal))}
+                          </strong>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </Card>
 
         {/* Right: Past Settlement History */}
@@ -221,8 +228,8 @@ function Settlement() {
                     <div className="history-icon-circle">✓</div>
                     <div className="history-info">
                       <div className="history-text">
-                        <strong>{fromM?.name.split(" ")[0]}</strong> paid{" "}
-                        <strong>{toM?.name.split(" ")[0]}</strong>
+                        <strong>{fromM?.name || "Person"}</strong> paid{" "}
+                        <strong>{toM?.name || "Person"}</strong>
                       </div>
                       <small className="history-date">
                         {formatDate(set.date)} {set.notes && `• ${set.notes}`}
